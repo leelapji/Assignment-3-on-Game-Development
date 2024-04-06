@@ -1,138 +1,73 @@
-// Iteration 2: Generating two random numbers (0 to 100) and displaying the same in the game.html
-var firstNumber = Math.round(Math.random() * 100);
 const firstNumberBox = document.getElementById("number1");
-
-var secondNumber = Math.round(Math.random() * 100);
 const secondNumberBox = document.getElementById("number2");
-
-
-// Iteration 3: Creating variables required to make the game functional
-var operation;
-var score = 0;
+const resultBox = document.getElementById("number3");
 const addition = document.getElementById("plus");
 const subtraction = document.getElementById("minus");
 const multiplication = document.getElementById("mul");
 const division = document.getElementById("divide");
 const remainder = document.getElementById("modulus");
+const timer = document.getElementById("timer");
 
-// Iteration 4: Creating a variable for number 3 and a variable for storing the html element with the Id "number3"
-var resultBox = document.getElementById("number3");
-var result;
+let firstNumber, secondNumber, result, operation, score = 0;
+let time = 20;
+let timerId;
 
-// Iteration 5: Creating a randomise function to make the game functional
 function randomize() {
   firstNumber = Math.round(Math.random() * 100);
   secondNumber = Math.round(Math.random() * 100);
 
   if (firstNumber < secondNumber) {
-    var extra = firstNumber;
-    firstNumber = secondNumber;
-    secondNumber = extra;
+    [firstNumber, secondNumber] = [secondNumber, firstNumber];
   }
 
-  operation = Math.round(Math.random() * 5);
+  operation = Math.floor(Math.random() * 5) + 1;
+
   switch (operation) {
-    case 1:
-      result = firstNumber + secondNumber;
-      break;
-
-    case 2:
-      result = firstNumber - secondNumber;
-      break;
-
-    case 3:
-      result = firstNumber * secondNumber;
-      break;
-
-    case 4:
-      result = Math.floor(firstNumber / secondNumber);
-      break;
-
-    case 5:
-      result = firstNumber % secondNumber;
-      break;
-
-    case 0:
-      randomize();
+    case 1: result = firstNumber + secondNumber; break;
+    case 2: result = firstNumber - secondNumber; break;
+    case 3: result = firstNumber * secondNumber; break;
+    case 4: result = Math.floor(firstNumber / secondNumber); break;
+    case 5: result = firstNumber % secondNumber; break;
   }
 
-  firstNumberBox.innerHTML = firstNumber;
-  secondNumberBox.innerHTML = secondNumber;
-  resultBox.innerHTML = result;
-
-  console.log(firstNumber + " " + secondNumber + " " + result + " " + operation);
+  firstNumberBox.textContent = firstNumber;
+  secondNumberBox.textContent = secondNumber;
+  resultBox.textContent = result;
 }
 
-randomize();
-
-// Iteration 6: Making the Operators (button) functional
-addition.onclick = () => {
-  if (firstNumber + secondNumber === result) {
-    score++;
-    randomize();
-    resetTime(timerId);
-  } else {
-    location.href = "gameover.html?score=" + score;
-  }
-};
-
-subtraction.onclick = () => {
-  if (firstNumber - secondNumber === result) {
-    score++;
-    randomize();
-    resetTime(timerId);
-  } else {
-    location.href = "gameover.html?score=" + score;
-  }
-};
-
-multiplication.onclick = () => {
-  if (firstNumber * secondNumber === result) {
-    score++;
-    randomize();
-    resetTime(timerId);
-  } else {
-    location.href = "gameover.html?score=" + score;
-  }
-};
-
-division.onclick = () => {
-  if (Math.floor(firstNumber / secondNumber) === result) {
-    score++;
-    randomize();
-    resetTime(timerId);
-  } else {
-    location.href = "gameover.html?score=" + score;
-  }
-};
-
-remainder.onclick = () => {
-  if (firstNumber % secondNumber === result) {
-    score++;
-    randomize();
-    resetTime(timerId);
-  } else {
-    location.href = "gameover.html?score=" + score;
-  }
-};
-
-// Iteration 7: Making Timer functional
-var time = 20;
-var timerId;
-
 function startTimer() {
-  time = 20;
-  timer.innerHTML = time;
   timerId = setInterval(() => {
-    time--;
-    if (time == 0) location.href = "./gameover.html?score=" + score;
-    timer.innerHTML = time;
+    timer.textContent = --time;
+    if (time === 0) {
+      clearInterval(timerId);
+      location.href = "./gameover.html?score=" + score;
+    }
   }, 1000);
 }
 
-function resetTime(intervalId) {
-  clearInterval(intervalId);
+function resetTime() {
+  clearInterval(timerId);
+  time = 20;
+  timer.textContent = time;
   startTimer();
 }
 
+addition.onclick = () => evaluateOperation(firstNumber + secondNumber);
+subtraction.onclick = () => evaluateOperation(firstNumber - secondNumber);
+multiplication.onclick = () => evaluateOperation(firstNumber * secondNumber);
+division.onclick = () => evaluateOperation(Math.floor(firstNumber / secondNumber));
+remainder.onclick = () => evaluateOperation(firstNumber % secondNumber);
+
+function evaluateOperation(userResult) {
+  if (userResult === result) {
+    score++;
+    randomize();
+    resetTime();
+  } else {
+    clearInterval(timerId);
+    location.href = "./gameover.html?score=" + score;
+  }
+}
+
+randomize();
 startTimer();
